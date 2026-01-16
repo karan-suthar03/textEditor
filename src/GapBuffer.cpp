@@ -10,11 +10,15 @@ size_t GapBuffer::cursor() const {
     return gapStart;
 }
 
+size_t GapBuffer::size() const {
+    return buffer.size() - (gapEnd - gapStart);
+}
+
 void GapBuffer::insert(char c) {
     buffer[gapStart++] = c;
 }
 
-void GapBuffer::backspace() {
+void GapBuffer::deleteLeft() {
     if (gapStart > 0) {
         gapStart--;
     }

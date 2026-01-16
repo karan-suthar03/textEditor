@@ -10,7 +10,7 @@ public:
     void moveRight();
 
     void insert(char c);
-    void backspace();
+    void deleteLeft();
 
     void loadFromString(const std::string& str);
     std::string toString() const;
@@ -18,6 +18,7 @@ public:
     std::string getLineFrom(size_t startIndex, size_t size) const;
 
     size_t cursor() const;
+    size_t size() const;
 
 private:
     std::vector<char> buffer;

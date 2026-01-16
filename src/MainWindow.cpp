@@ -102,6 +102,9 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         break;
     }
     case WM_KEYDOWN:{
+        if(m_editor.handleKeyDown(wParam)){
+            InvalidateRect(m_hwnd, nullptr, TRUE);
+        }
         result = 0;
         break;
     }

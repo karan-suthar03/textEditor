@@ -6,7 +6,15 @@ Editor::Editor(){
     std::string testData =
         "Hello Gap Buffer!\n"
         "This is a demo.\n"
-        "Rendering text using WinAPI.\n";
+        "Rendering text using WinAPI."
+        "This is a demo.\n"
+        "Rendering text using WinAPI."
+        "This is a demo.\n"
+        "Rendering text using WinAPI."
+        "This is a demo.\n"
+        "Rendering text using WinAPI."
+        "This is a demo.\n"
+        "Rendering text using WinAPI.";
 
     m_buffer = GapBuffer();
     loadFromString(testData);
@@ -61,4 +69,124 @@ void Editor::getCursorPosition(int& row, int& col) const{
     col = static_cast<int>(cursorPos - m_lineStarts[row]);
 
     LOG("Cursor position row %d col %d\n",row,col);
+}
+
+void Editor::backspace(){
+    if(m_buffer.cursor() == 0){
+        return;
+    }
+    int cursorRow;
+    int cursorCol;
+    getCursorPosition(cursorRow,cursorCol);
+
+    if(cursorCol == 0){
+        m_lineStarts.erase(m_lineStarts.begin() + cursorRow);
+        for (size_t i = cursorRow; i < m_lineStarts.size(); i++){
+            m_lineStarts[i]--;
+        }
+    }else{
+        for (size_t i = cursorRow + 1; i < m_lineStarts.size(); i++){
+            m_lineStarts[i]--;
+        }
+    }
+    m_buffer.deleteLeft();
+}
+
+void Editor::moveUp(){
+    int cursorRow;
+    int cursorCol;
+    getCursorPosition(cursorRow,cursorCol);
+
+    if(cursorRow == 0){
+        return;
+    }
+
+    size_t newRowStart = m_lineStarts[cursorRow - 1];
+    size_t newRowEnd = m_lineStarts[cursorRow] - 1;
+
+    size_t newCursorPos = newRowStart + cursorCol;
+    if(newCursorPos > newRowEnd){
+        newCursorPos = newRowEnd;
+    }
+
+    while(m_buffer.cursor() > newCursorPos){
+        m_buffer.moveLeft();
+    }
+}
+
+void Editor::moveDown(){
+    int cursorRow;
+    int cursorCol;
+    getCursorPosition(cursorRow,cursorCol);
+
+    if(cursorRow + 1 >= static_cast<int>(m_lineStarts.size())){
+        return;
+    }
+
+    size_t newRowStart = m_lineStarts[cursorRow + 1];
+    size_t newRowEnd;
+    if(cursorRow + 2 < static_cast<int>(m_lineStarts.size())){
+        newRowEnd = m_lineStarts[cursorRow + 2] - 1;
+    }else{
+        newRowEnd = m_buffer.size();
+    }
+
+    size_t newCursorPos = newRowStart + cursorCol;
+    if(newCursorPos > newRowEnd){
+        newCursorPos = newRowEnd;
+    }
+
+    while(m_buffer.cursor() < newCursorPos){
+        m_buffer.moveRight();
+    }
+}
+
+void Editor::newline(){
+    m_buffer.insert('\n');
+    int cursorRow;
+    int cursorCol;
+    getCursorPosition(cursorRow,cursorCol);
+    size_t currentCursorPos = m_buffer.cursor();
+    m_lineStarts.insert(
+        m_lineStarts.begin() + cursorRow + 1,
+        currentCursorPos
+    );  
+    for (size_t i = cursorRow + 2; i < m_lineStarts.size(); i++){
+        m_lineStarts[i]++;
+    }
+
+
+}
+
+bool Editor::handleKeyDown(WPARAM key){
+    bool result = false;
+    switch(key){
+        case VK_LEFT:
+            m_buffer.moveLeft();
+            result = true;
+            break;
+        case VK_RIGHT:
+            m_buffer.moveRight();
+            result = true;
+            break;
+        case VK_BACK:
+            backspace();
+            result = true;
+            break;
+        case VK_UP:
+            moveUp();
+            result = true;
+            break;
+        case VK_DOWN:
+            moveDown();
+            result = true;
+            break;
+        case VK_RETURN:
+            newline();
+            result = true;
+            break;
+        default:
+            break;
+    }
+    return result;
 }
