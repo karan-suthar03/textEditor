@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <../include/base.h>
 
 class GapBuffer {
 public:
@@ -24,4 +25,5 @@ private:
     std::vector<char> buffer;
     size_t gapStart;
     size_t gapEnd;
+    int gapSize = KB(1);
 };

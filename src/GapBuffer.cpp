@@ -1,4 +1,5 @@
 #include "../include/GapBuffer.h"
+#include "../include/base.h"
 
 GapBuffer::GapBuffer(size_t initial_capacity)
     : buffer(initial_capacity, '\0'),
@@ -15,6 +16,14 @@ size_t GapBuffer::size() const {
 }
 
 void GapBuffer::insert(char c) {
+
+    if (gapStart == gapEnd) {
+        size_t oldGapSize = gapEnd - gapStart;
+        size_t newGapSize = oldGapSize + gapSize;
+
+        buffer.insert(buffer.begin() + gapStart, gapSize, '\0');
+        gapEnd += gapSize;
+    }    
     buffer[gapStart++] = c;
 }
 
@@ -37,18 +46,11 @@ void GapBuffer::moveRight() {
 }
 
 void GapBuffer::loadFromString(const std::string& text) {
-    size_t gapSize = 1024;
-
-    buffer.resize(text.size() + gapSize);
-
-    gapStart = 0;
-    gapEnd   = gapSize - 1;
-
-    memcpy(
-        buffer.data() + gapEnd + 1,
-        text.data(),
-        text.size()
-    );
+    buffer.clear();
+    buffer.reserve(text.size() + gapSize);
+    buffer.insert(buffer.end(), text.begin(), text.end());
+    gapStart = text.size();
+    gapEnd = buffer.size();
 }
 
 std::string GapBuffer::toString() const {

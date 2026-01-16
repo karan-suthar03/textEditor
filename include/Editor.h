@@ -7,7 +7,7 @@ class Editor {
 public:
     GapBuffer m_buffer;
 
-    Editor();
+    Editor(const std::string& text = "");
 
     void loadFromString(const std::string& text);
     void getCursorPosition(int& row, int& col) const;

@@ -2,45 +2,38 @@
 #include "../include/debug.h"
 
 
-Editor::Editor(){
-    std::string testData =
-        "Hello Gap Buffer!\n"
-        "This is a demo.\n"
-        "Rendering text using WinAPI."
-        "This is a demo.\n"
-        "Rendering text using WinAPI."
-        "This is a demo.\n"
-        "Rendering text using WinAPI."
-        "This is a demo.\n"
-        "Rendering text using WinAPI."
-        "This is a demo.\n"
-        "Rendering text using WinAPI.";
-
+Editor::Editor(const std::string& text){
     m_buffer = GapBuffer();
-    loadFromString(testData);
-
+    loadFromString(text);
 }
 
 void Editor::loadFromString(const std::string& text){
+    LOG(text.c_str());
     m_lineStarts.push_back(0);
+    std::string normalizedText;
+    normalizedText.reserve(text.size());
     for (size_t i = 0; i < text.size(); i++)
     {
         if(text[i] == '\r'){
             if(i + 1 < text.size() && text[i + 1] == '\n'){
-                m_lineStarts.push_back(i + 2);
+                normalizedText.push_back('\n');
                 i++;
             }else{
-                m_lineStarts.push_back(i + 1);
+                normalizedText.push_back('\n');
             }
-            m_buffer.insert('\n');
-            continue;
+        }else{
+            normalizedText.push_back(text[i]);
         }
+    }
 
-        if(text[i] == '\n'){
+    for (size_t i = 0; i < normalizedText.size(); i++)
+    {
+        if(normalizedText[i] == '\n'){
             m_lineStarts.push_back(i + 1);
         }
-        m_buffer.insert(text[i]);
     }
+
+    m_buffer.loadFromString(normalizedText);
 }
 
 std::string Editor::getRow(int row,int size) const{

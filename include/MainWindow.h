@@ -24,6 +24,8 @@ private:
         LPARAM lParam
     );
 
+    void loadFile(const char* filePath);
+
     LRESULT handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     HWND m_hwnd;

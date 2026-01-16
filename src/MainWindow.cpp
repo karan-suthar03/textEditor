@@ -1,5 +1,7 @@
 #include "../include/MainWindow.h"
+#include "../include/debug.h"
 #include <cstdio>
+#include "../include/base.h"
 
 MainWindow::MainWindow()
     : m_hwnd(nullptr),
@@ -41,7 +43,7 @@ bool MainWindow::Create(
     if (m_hwnd == nullptr) {
         return false;
     }
-
+    DragAcceptFiles(m_hwnd, TRUE);
     ShowWindow(m_hwnd, nCmdShow);
     UpdateWindow(m_hwnd);
     return true;
@@ -96,7 +98,7 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         m_cursorColor = CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
 
         // m_gapBuffer = GapBuffer();
-        m_editor = Editor();
+        m_editor = Editor("\r\nhello\nworld\nthis is a test");
 
         result = 0;
         break;
@@ -224,10 +226,47 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         result = 1;
         break;
 
+    case WM_DROPFILES:
+    {
+        HDROP hDrop = (HDROP)wParam;
+        int file_count = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+        LOG("Files dropped: %d\n", file_count);
+        if (file_count == 1) {
+            char file_path[KB(4)];
+            DragQueryFileA(hDrop, 0, file_path, KB(4));
+            LOG("Loading file: %s\n", file_path);
+
+            loadFile(file_path);
+            InvalidateRect(m_hwnd, nullptr, TRUE);
+        }
+        result = 0;
+        break;
+    }
     default:
         result = DefWindowProc(m_hwnd, uMsg, wParam, lParam);
         break;
     }
 
     return result;
+}
+
+void MainWindow::loadFile(const char* filePath) {
+    FILE* file = nullptr;
+    fopen_s(&file, filePath, "rb");
+    if (file) {
+        fseek(file, 0, SEEK_END);
+        long fileSize = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        std::string fileContent;
+        fileContent.resize(fileSize);
+
+        fread(fileContent.data(), 1, fileSize, file);
+        fclose(file);
+        
+        m_editor = Editor(fileContent);
+        LOG("File loaded successfully. Size: %ld bytes\n", fileSize);
+    } else {
+        LOG("Failed to open file: %s\n", filePath);
+    }
 }
