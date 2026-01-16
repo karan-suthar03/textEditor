@@ -31,3 +31,28 @@ void GapBuffer::moveRight() {
 
     buffer[gapStart++] = buffer[gapEnd++];
 }
+
+void GapBuffer::loadFromString(const std::string& text) {
+    size_t gapSize = 1024;
+
+    buffer.resize(text.size() + gapSize);
+
+    gapStart = 0;
+    gapEnd   = gapSize - 1;
+
+    memcpy(
+        buffer.data() + gapEnd + 1,
+        text.data(),
+        text.size()
+    );
+}
+
+std::string GapBuffer::toString() const {
+    std::string result;
+    result.reserve(buffer.size() - (gapEnd - gapStart + 1));
+
+    result.append(buffer.data(), gapStart);
+    result.append(buffer.data() + gapEnd + 1, buffer.size() - gapEnd - 1);
+
+    return result;
+}

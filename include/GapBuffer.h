@@ -12,6 +12,9 @@ public:
     void insert(char c);
     void backspace();
 
+    void loadFromString(const std::string& str);
+    std::string toString() const;
+
     size_t cursor() const;
 
 private:

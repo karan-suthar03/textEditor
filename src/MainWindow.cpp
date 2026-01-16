@@ -95,6 +95,15 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
         m_cursorColor = CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
 
+        m_gapBuffer = GapBuffer();
+        
+        std::string testData =
+            "Hello Gap Buffer!\n"
+            "This is a demo.\n"
+            "Rendering text using WinAPI.\n";
+
+        m_gapBuffer.loadFromString(testData);
+
         result = 0;
         break;
     }
@@ -114,10 +123,7 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         SetBkMode(hdc, TRANSPARENT);
         SetTextColor(hdc, m_fontColor);
 
-        const char* demoText =
-            "Hello Gap Buffer!\n"
-            "This is a demo.\n"
-            "Rendering text using WinAPI.\n";
+        const char* demoText = m_gapBuffer.toString().c_str();
 
         int x = 0;
         int y = 0;

@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include "GapBuffer.h"
 
 
 class MainWindow {
@@ -27,9 +28,11 @@ private:
 
     HWND m_hwnd;
     
-    HBRUSH m_background;
+    HBRUSH   m_background;
     COLORREF m_fontColor;
     COLORREF m_selectionColor;
-    HFONT m_font;
-    HPEN m_cursorColor;
+    HFONT    m_font;
+    HPEN     m_cursorColor;
+    
+    GapBuffer m_gapBuffer;
 };
