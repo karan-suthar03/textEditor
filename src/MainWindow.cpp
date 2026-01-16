@@ -135,6 +135,14 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         result = 0;
         break;
     }
+    case WM_CHAR:{
+        char c = static_cast<char>(wParam);
+        if(c >= 32){
+            if(m_editor.handleCharacterInput(c)) InvalidateRect(m_hwnd, nullptr, TRUE);
+        }
+        result = 0;
+        break;
+    }
     case WM_SIZE:
         InvalidateRect(m_hwnd, nullptr, TRUE);
         result = 0;

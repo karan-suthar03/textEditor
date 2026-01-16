@@ -159,3 +159,16 @@ void Editor::newline(){
 
 
 }
+
+bool Editor::handleCharacterInput(char c){
+    int cursorRow;
+    int cursorCol;
+    getCursorPosition(cursorRow,cursorCol);
+
+    for (size_t i = cursorRow + 1; i < m_lineStarts.size(); i++){
+        m_lineStarts[i]++;
+    }
+
+    m_buffer.insert(c);
+    return true;
+}
