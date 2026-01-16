@@ -101,6 +101,10 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         result = 0;
         break;
     }
+    case WM_KEYDOWN:{
+        result = 0;
+        break;
+    }
     case WM_SIZE:
         InvalidateRect(m_hwnd, nullptr, TRUE);
         result = 0;
@@ -145,8 +149,23 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
                 data.c_str(),
                 static_cast<int>(data.size())
             );
-        }        
+        }
 
+        int cursorCol;
+        int cursorRow;
+        m_editor.getCursorPosition(cursorRow,cursorCol);
+
+        HPEN oldPen = (HPEN)SelectObject(hdc, m_cursorColor);
+
+        Rectangle(
+            hdc,
+            cursorCol * charWidth,
+            cursorRow * lineHeight,
+            cursorCol * charWidth + 3,
+            cursorRow * lineHeight + lineHeight
+        );
+
+        SelectObject(hdc, oldPen);
         SelectObject(hdc, oldFont);
 
         EndPaint(m_hwnd, &ps);

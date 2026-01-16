@@ -73,7 +73,7 @@ std::string GapBuffer::getLineFrom(size_t startIndex, size_t size) const {
         if (logicalIndex < gapStart) {
             physicalIndex = logicalIndex;
         } else {
-            physicalIndex = logicalIndex + (gapEnd - gapStart + 1);
+            physicalIndex = logicalIndex + (gapEnd - gapStart);
         }
         
         if (physicalIndex >= buffer.size()) {

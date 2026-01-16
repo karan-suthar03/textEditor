@@ -8,6 +8,7 @@ public:
     Editor();
 
     void loadFromString(const std::string& text);
+    void getCursorPosition(int& row, int& col) const;
 
     std::string getRow(int row,int size = 100) const;
 
