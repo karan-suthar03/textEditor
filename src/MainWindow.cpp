@@ -22,7 +22,10 @@ bool MainWindow::Create(
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wc.hbrBackground = nullptr;
 
-    RegisterClass(&wc);
+    if (!RegisterClass(&wc)) {
+        return false;
+    }
+
     m_hwnd = CreateWindowExA(
         0,
         className,
@@ -91,6 +94,9 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         );
 
         m_cursorColor = CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
+
+        result = 0;
+        break;
     }
     case WM_SIZE:
         result = 0;
@@ -102,6 +108,37 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         HDC hdc = BeginPaint(m_hwnd, &ps);
 
         FillRect(hdc, &ps.rcPaint, m_background);
+
+        HFONT oldFont = (HFONT)SelectObject(hdc, m_font);
+
+        SetBkMode(hdc, TRANSPARENT);
+        SetTextColor(hdc, m_fontColor);
+
+        const char* demoText =
+            "Hello Gap Buffer!\n"
+            "This is a demo.\n"
+            "Rendering text using WinAPI.\n";
+
+        int x = 0;
+        int y = 0;
+
+        const char* start = demoText;
+        const char* p = demoText;
+
+        while (*p) {
+            if (*p == '\n') {
+                TextOutA(hdc, x, y, start, (int)(p - start));
+                y += 24;
+                start = p + 1;
+            }
+            p++;
+        }
+
+        if (p != start) {
+            TextOutA(hdc, x, y, start, (int)(p - start));
+        }
+
+        SelectObject(hdc, oldFont);
 
         EndPaint(m_hwnd, &ps);
         result = 0;
