@@ -1,4 +1,5 @@
 #include "../include/Editor.h"
+#include "../include/debug.h"
 
 
 Editor::Editor(){
@@ -40,7 +41,7 @@ std::string Editor::getRow(int row,int size) const{
     if(row < 0 || row >= static_cast<int>(m_lineStarts.size())){
         return "";
     }
-    
+    LOG("Getting row %d and size %d\n",row,size);
     size_t startIndex = m_lineStarts[row];
 
     return m_buffer.getLineFrom(startIndex,size);

@@ -4,7 +4,7 @@ if not exist out (
     mkdir out
 )
 
-g++ src\*.cpp -I include -mwindows -o out\TextEditor.exe
+g++ -g src\*.cpp -I include -o out\TextEditor.exe -lgdi32 -luser32
 
 IF %ERRORLEVEL% NEQ 0 (
     echo.
