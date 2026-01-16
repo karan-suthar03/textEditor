@@ -102,9 +102,36 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         break;
     }
     case WM_KEYDOWN:{
-        if(m_editor.handleKeyDown(wParam)){
-            InvalidateRect(m_hwnd, nullptr, TRUE);
+        bool r = false;
+        switch(wParam){
+            case VK_LEFT:
+                m_editor.m_buffer.moveLeft();
+                r = true;
+                break;
+            case VK_RIGHT:
+                m_editor.m_buffer.moveRight();
+                r = true;
+                break;
+            case VK_BACK:
+                m_editor.backspace();
+                r = true;
+                break;
+            case VK_UP:
+                m_editor.moveUp();
+                r = true;
+                break;
+            case VK_DOWN:
+                m_editor.moveDown();
+                r = true;
+                break;
+            case VK_RETURN:
+                m_editor.newline();
+                r = true;
+                break;
+            default:
+                break;
         }
+        if(r) InvalidateRect(m_hwnd, nullptr, TRUE);
         result = 0;
         break;
     }

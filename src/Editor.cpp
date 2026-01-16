@@ -157,36 +157,3 @@ void Editor::newline(){
 
 
 }
-
-bool Editor::handleKeyDown(WPARAM key){
-    bool result = false;
-    switch(key){
-        case VK_LEFT:
-            m_buffer.moveLeft();
-            result = true;
-            break;
-        case VK_RIGHT:
-            m_buffer.moveRight();
-            result = true;
-            break;
-        case VK_BACK:
-            backspace();
-            result = true;
-            break;
-        case VK_UP:
-            moveUp();
-            result = true;
-            break;
-        case VK_DOWN:
-            moveDown();
-            result = true;
-            break;
-        case VK_RETURN:
-            newline();
-            result = true;
-            break;
-        default:
-            break;
-    }
-    return result;
-}
