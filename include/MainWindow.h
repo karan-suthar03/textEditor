@@ -1,6 +1,6 @@
 #pragma once
 #include <windows.h>
-#include "GapBuffer.h"
+#include "Editor.h"
 
 
 class MainWindow {
@@ -34,5 +34,5 @@ private:
     HFONT    m_font;
     HPEN     m_cursorColor;
     
-    GapBuffer m_gapBuffer;
+    Editor m_editor;
 };

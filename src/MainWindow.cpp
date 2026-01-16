@@ -95,19 +95,14 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
         m_cursorColor = CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
 
-        m_gapBuffer = GapBuffer();
-        
-        std::string testData =
-            "Hello Gap Buffer!\n"
-            "This is a demo.\n"
-            "Rendering text using WinAPI.\n";
-
-        m_gapBuffer.loadFromString(testData);
+        // m_gapBuffer = GapBuffer();
+        m_editor = Editor();
 
         result = 0;
         break;
     }
     case WM_SIZE:
+        InvalidateRect(m_hwnd, nullptr, TRUE);
         result = 0;
         break;
 
@@ -115,34 +110,42 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(m_hwnd, &ps);
+        RECT rc;
 
-        FillRect(hdc, &ps.rcPaint, m_background);
+        GetClientRect(m_hwnd, &rc);
+        
+        FillRect(hdc, &rc, m_background);
 
         HFONT oldFont = (HFONT)SelectObject(hdc, m_font);
 
         SetBkMode(hdc, TRANSPARENT);
         SetTextColor(hdc, m_fontColor);
 
-        const char* demoText = m_gapBuffer.toString().c_str();
+        TEXTMETRIC tm;
+        GetTextMetricsA(hdc,&tm);
 
-        int x = 0;
-        int y = 0;
+        int windowHeight = rc.bottom - rc.top;
+        int windowWidth = rc.right - rc.left;
 
-        const char* start = demoText;
-        const char* p = demoText;
+        int charHeight = tm.tmHeight;
+        int charWidth = tm.tmAveCharWidth;
 
-        while (*p) {
-            if (*p == '\n') {
-                TextOutA(hdc, x, y, start, (int)(p - start));
-                y += 24;
-                start = p + 1;
-            }
-            p++;
-        }
+        int lineHeight = charHeight + tm.tmExternalLeading;
 
-        if (p != start) {
-            TextOutA(hdc, x, y, start, (int)(p - start));
-        }
+        int rows = windowHeight/lineHeight;
+        int cols = windowWidth/charWidth;
+        
+        for (size_t row = 0; row < rows; row++)
+        {
+            const std::string data = m_editor.getRow(row,cols);
+            TextOutA(
+                hdc,
+                0,
+                row * lineHeight,
+                data.c_str(),
+                static_cast<int>(data.size())
+            );
+        }        
 
         SelectObject(hdc, oldFont);
 
