@@ -142,10 +142,12 @@ void Editor::moveDown(){
 }
 
 void Editor::newline(){
-    m_buffer.insert('\n');
     int cursorRow;
     int cursorCol;
     getCursorPosition(cursorRow,cursorCol);
+    
+    m_buffer.insert('\n');
+    
     size_t currentCursorPos = m_buffer.cursor();
     m_lineStarts.insert(
         m_lineStarts.begin() + cursorRow + 1,
