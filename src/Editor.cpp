@@ -42,8 +42,14 @@ std::string Editor::getRow(int row,int size) const{
     }
     LOG("Getting row %d and size %d\n",row,size);
     size_t startIndex = m_lineStarts[row];
+    size_t endIndex;
+    if(row + 1 < static_cast<int>(m_lineStarts.size())){
+        endIndex = m_lineStarts[row + 1] - 1;
+    }else{
+        endIndex = m_buffer.size();
+    }
 
-    return m_buffer.getLineFrom(startIndex,size);
+    return m_buffer.getLineFrom(startIndex, endIndex, size);
 }
 
 void Editor::getCursorPosition(int& row, int& col) const{

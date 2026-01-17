@@ -16,7 +16,7 @@ public:
     void loadFromString(const std::string& str);
     std::string toString() const;
 
-    std::string getLineFrom(size_t startIndex, size_t size) const;
+    std::string getLineFrom(size_t startIndex, size_t endIndex, size_t size) const;
 
     size_t cursor() const;
     size_t size() const;

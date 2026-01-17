@@ -63,37 +63,24 @@ std::string GapBuffer::toString() const {
     return result;
 }
 
-std::string GapBuffer::getLineFrom(size_t startIndex, size_t size) const {
+std::string GapBuffer::getLineFrom(size_t startIndex, size_t endIndex, size_t size) const{
     std::string result;
     result.reserve(size);
 
-    size_t logicalIndex = startIndex;
-    size_t endIndex = startIndex + size;
+    size_t logicalEnd = startIndex + size;
+    logicalEnd = MIN(logicalEnd, endIndex);
 
-    while (logicalIndex < endIndex) {
-        char c;
+    size_t gapSize = gapEnd - gapStart;
 
-        
+    size_t leftStart = startIndex;
+    size_t leftEnd   = MIN(logicalEnd, gapStart);
 
-        size_t physicalIndex;
-        if (logicalIndex < gapStart) {
-            physicalIndex = logicalIndex;
-        } else {
-            physicalIndex = logicalIndex + (gapEnd - gapStart);
-        }
-        
-        if (physicalIndex >= buffer.size()) {
-            break;
-        }
-        
-        c = buffer[physicalIndex];
-        
-        if (c == '\n') {
-            break;
-        }
-        
-        result += c;
-        logicalIndex++;
-    }
+    if (leftStart < leftEnd) result.append(buffer.begin() + leftStart, buffer.begin() + leftEnd);
+
+    size_t rightStart = MAX(startIndex, gapStart);
+    size_t rightEnd   = logicalEnd;
+
+    if (rightStart < rightEnd) result.append(buffer.begin() + rightStart + gapSize, buffer.begin() + rightEnd + gapSize);
+
     return result;
 }

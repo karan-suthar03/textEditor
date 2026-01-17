@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "../include/MainWindow.h"
 
 int APIENTRY WinMain(
