@@ -4,7 +4,7 @@ if not exist out (
     mkdir out
 )
 
-g++ -g src\*.cpp -I include -o out\TextEditor.exe -lgdi32 -luser32 -DNDEBUG
+g++ -std=c++17 -g src\*.cpp -I include -o out\TextEditor.exe -lgdi32 -luser32 -DNDEBUG
 
 IF %ERRORLEVEL% NEQ 0 (
     echo.

@@ -251,8 +251,7 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 }
 
 void MainWindow::loadFile(const char* filePath) {
-    FILE* file = nullptr;
-    fopen_s(&file, filePath, "rb");
+    FILE* file = fopen(filePath, "rb");
     if (file) {
         fseek(file, 0, SEEK_END);
         long fileSize = ftell(file);
@@ -261,7 +260,7 @@ void MainWindow::loadFile(const char* filePath) {
         std::string fileContent;
         fileContent.resize(fileSize);
 
-        fread(fileContent.data(), 1, fileSize, file);
+        fread(&fileContent[0], 1, fileSize, file);
         fclose(file);
         
         m_editor = Editor(fileContent);
