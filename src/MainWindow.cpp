@@ -10,6 +10,7 @@ MainWindow::MainWindow()
       m_selectionColor(RGB(50, 50, 255)),
       m_font(nullptr),
       m_cursorColor(nullptr),
+      m_gutterColor(RGB(40, 40, 40)),
       m_scrollTopLine(0),
       m_scrollLeftCol(0),
       m_openedFilePath("") {
@@ -190,15 +191,51 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
         int lineHeight = charHeight + tm.tmExternalLeading;
 
+        int maxLines = m_editor.getMaxLineNum();
+
+        LOG("Max lines: %d\n", maxLines);
+
+        int digits = 0;
+        while (maxLines > 0)
+        {
+            digits++;
+            maxLines/= 10;
+        }
+
+        int gutterWidth = charWidth * digits + charWidth;
+        
+        windowWidth -= gutterWidth;
+
         int rows = windowHeight/lineHeight + 1;
         int cols = windowWidth/charWidth + 1;
+
+        // need gutter brush as a member ig
+        HBRUSH gutterBrush = CreateSolidBrush(m_gutterColor);
+        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, gutterBrush);
+        Rectangle(hdc, 0, 0, gutterWidth, windowHeight);
+        SelectObject(hdc, oldBrush);
+        DeleteObject(gutterBrush);
         
         for (size_t row = 0; row < rows; row++)
         {
-            std::string visiblePart = m_editor.getRow(m_scrollTopLine + row, cols, m_scrollLeftCol);
+            std::string visiblePart = "";
+            if (m_editor.getRow(m_scrollTopLine + row, visiblePart, cols, m_scrollLeftCol))
+            {
+                int lineNumber = m_scrollTopLine + static_cast<int>(row) + 1;
+                char lineNumberStr[16];
+                snprintf(lineNumberStr, sizeof(lineNumberStr), "%*d", digits, lineNumber);
+                TextOutA(
+                    hdc,
+                    charWidth/2,
+                    row * lineHeight,
+                    lineNumberStr,
+                    static_cast<int>(strlen(lineNumberStr))
+                );
+            }
+            
             TextOutA(
                 hdc,
-                0,
+                gutterWidth,
                 row * lineHeight,
                 visiblePart.c_str(),
                 static_cast<int>(visiblePart.size())
@@ -213,9 +250,9 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
         Rectangle(
             hdc,
-            (cursorCol - m_scrollLeftCol) * charWidth,
+            (cursorCol - m_scrollLeftCol) * charWidth + gutterWidth,
             (cursorRow - m_scrollTopLine) * lineHeight,
-            (cursorCol - m_scrollLeftCol) * charWidth + 3,
+            (cursorCol - m_scrollLeftCol) * charWidth + 3 + gutterWidth,
             (cursorRow - m_scrollTopLine) * lineHeight + lineHeight
         );
 

@@ -14,13 +14,17 @@ public:
 
     bool handleCharacterInput(char c);
 
-    std::string getRow(int row,int size = 100,int offset = 0) const;
+    bool getRow(int row, std::string& out, int size = 100, int offset = 0) const;
 
     // use enum and make these private later
     void moveUp();
     void moveDown();
     void backspace();
     void newline();
+
+    size_t getMaxLineNum() const {
+        return m_lineStarts.size();
+    }
 private:
     std::vector<size_t> m_lineStarts;
 };

@@ -36,9 +36,9 @@ void Editor::loadFromString(const std::string& text){
     m_buffer.loadFromString(normalizedText);
 }
 
-std::string Editor::getRow(int row,int size,int offset) const{
+bool Editor::getRow(int row, std::string& out, int size, int offset) const{
     if(row < 0 || row >= static_cast<int>(m_lineStarts.size())){
-        return "";
+        return false;
     }
     LOG("Getting row %d and size %d\n",row,size);
     size_t startIndex = m_lineStarts[row] + offset;
@@ -50,10 +50,12 @@ std::string Editor::getRow(int row,int size,int offset) const{
     }
 
     if (startIndex > endIndex) {
-        return "";
+        out = "";
+        return true;
     }
 
-    return m_buffer.getLineFrom(startIndex, endIndex, size);
+    out = m_buffer.getLineFrom(startIndex, endIndex, size);
+    return true;
 }
 
 void Editor::getCursorPosition(int& row, int& col) const{

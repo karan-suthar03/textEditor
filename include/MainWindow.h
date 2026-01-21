@@ -35,6 +35,7 @@ private:
     COLORREF m_selectionColor;
     HFONT    m_font;
     HPEN     m_cursorColor;
+    COLORREF m_gutterColor;
     
     Editor m_editor;
 
