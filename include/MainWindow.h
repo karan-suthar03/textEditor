@@ -37,9 +37,12 @@ private:
     HPEN     m_cursorColor;
     
     Editor m_editor;
+
+    std::string m_openedFilePath;
     
     int m_scrollTopLine;
     int m_scrollLeftCol;
     
     void adjustScrollToCursor();
+    void saveFile();
 };

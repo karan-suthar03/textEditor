@@ -11,7 +11,8 @@ MainWindow::MainWindow()
       m_font(nullptr),
       m_cursorColor(nullptr),
       m_scrollTopLine(0),
-      m_scrollLeftCol(0) {
+      m_scrollLeftCol(0),
+      m_openedFilePath("") {
 }
 bool MainWindow::Create(
     HINSTANCE hInstance,
@@ -107,6 +108,7 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     }
     case WM_KEYDOWN:{
         bool r = false;
+        bool ctrlDown = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
         switch(wParam){
             case VK_LEFT:
                 m_editor.m_buffer.moveLeft();
@@ -132,6 +134,12 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
                 m_editor.newline();
                 r = true;
                 break;
+            case 'S':
+                if(ctrlDown){
+                    saveFile();
+                }
+                r = true;
+                break;
             default:
                 break;
         }
@@ -143,8 +151,9 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         break;
     }
     case WM_CHAR:{
-        char c = static_cast<char>(wParam);
-        if(c >= 32){
+        char c = static_cast<char>(wParam);        
+        bool ctrlDown = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+        if(c >= 32 && !ctrlDown){
             if(m_editor.handleCharacterInput(c)) InvalidateRect(m_hwnd, nullptr, TRUE);
         }
         result = 0;
@@ -267,6 +276,7 @@ void MainWindow::loadFile(const char* filePath) {
 
         fread(&fileContent[0], 1, fileSize, file);
         fclose(file);
+        m_openedFilePath = filePath;
         
         m_editor = Editor(fileContent);
         LOG("File loaded successfully. Size: %ld bytes\n", fileSize);
@@ -314,4 +324,19 @@ void MainWindow::adjustScrollToCursor() {
     
     if (m_scrollTopLine < 0) m_scrollTopLine = 0;
     if (m_scrollLeftCol < 0) m_scrollLeftCol = 0;
+}
+
+void MainWindow::saveFile() {
+    if(m_openedFilePath.empty()){
+        return;
+    }
+    FILE* file = fopen(m_openedFilePath.c_str(), "wb");
+    if (file) {
+        std::string content = m_editor.m_buffer.toString();
+        fwrite(content.c_str(), 1, content.size(), file);
+        fclose(file);
+        LOG("File saved successfully: %s\n", m_openedFilePath.c_str());
+    } else {
+        LOG("Failed to open file for saving: %s\n", m_openedFilePath.c_str());
+    }
 }
