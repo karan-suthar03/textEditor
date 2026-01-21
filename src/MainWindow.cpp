@@ -9,7 +9,9 @@ MainWindow::MainWindow()
       m_fontColor(RGB(208, 208, 208)),
       m_selectionColor(RGB(50, 50, 255)),
       m_font(nullptr),
-      m_cursorColor(nullptr) {
+      m_cursorColor(nullptr),
+      m_scrollTopLine(0),
+      m_scrollLeftCol(0) {
 }
 bool MainWindow::Create(
     HINSTANCE hInstance,
@@ -178,16 +180,19 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
         int rows = windowHeight/lineHeight;
         int cols = windowWidth/charWidth;
+
+        // changing the scroll in draw? should be separated
+        adjustScrollToCursor(rows, cols);
         
         for (size_t row = 0; row < rows; row++)
         {
-            const std::string data = m_editor.getRow(row,cols);
+            std::string visiblePart = m_editor.getRow(m_scrollTopLine + row, cols, m_scrollLeftCol);
             TextOutA(
                 hdc,
                 0,
                 row * lineHeight,
-                data.c_str(),
-                static_cast<int>(data.size())
+                visiblePart.c_str(),
+                static_cast<int>(visiblePart.size())
             );
         }
 
@@ -199,10 +204,10 @@ LRESULT MainWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
         Rectangle(
             hdc,
-            cursorCol * charWidth,
-            cursorRow * lineHeight,
-            cursorCol * charWidth + 3,
-            cursorRow * lineHeight + lineHeight
+            (cursorCol - m_scrollLeftCol) * charWidth,
+            (cursorRow - m_scrollTopLine) * lineHeight,
+            (cursorCol - m_scrollLeftCol) * charWidth + 3,
+            (cursorRow - m_scrollTopLine) * lineHeight + lineHeight
         );
 
         SelectObject(hdc, oldPen);
@@ -268,4 +273,24 @@ void MainWindow::loadFile(const char* filePath) {
     } else {
         LOG("Failed to open file: %s\n", filePath);
     }
+}
+
+void MainWindow::adjustScrollToCursor(int viewportRows, int viewportCols) {
+    int cursorRow, cursorCol;
+    m_editor.getCursorPosition(cursorRow, cursorCol);
+    
+    if (cursorRow < m_scrollTopLine) {
+        m_scrollTopLine = cursorRow;
+    } else if (cursorRow >= m_scrollTopLine + viewportRows) {
+        m_scrollTopLine = cursorRow - viewportRows + 1;
+    }
+    
+    if (cursorCol < m_scrollLeftCol) {
+        m_scrollLeftCol = cursorCol;
+    } else if (cursorCol >= m_scrollLeftCol + viewportCols) {
+        m_scrollLeftCol = cursorCol - viewportCols + 1;
+    }
+    
+    if (m_scrollTopLine < 0) m_scrollTopLine = 0;
+    if (m_scrollLeftCol < 0) m_scrollLeftCol = 0;
 }

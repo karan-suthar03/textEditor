@@ -37,4 +37,9 @@ private:
     HPEN     m_cursorColor;
     
     Editor m_editor;
+    
+    int m_scrollTopLine;
+    int m_scrollLeftCol;
+    
+    void adjustScrollToCursor(int viewportRows, int viewportCols);
 };

@@ -14,7 +14,7 @@ public:
 
     bool handleCharacterInput(char c);
 
-    std::string getRow(int row,int size = 100) const;
+    std::string getRow(int row,int size = 100,int offset = 0) const;
 
     // use enum and make these private later
     void moveUp();

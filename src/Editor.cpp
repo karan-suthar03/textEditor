@@ -36,17 +36,21 @@ void Editor::loadFromString(const std::string& text){
     m_buffer.loadFromString(normalizedText);
 }
 
-std::string Editor::getRow(int row,int size) const{
+std::string Editor::getRow(int row,int size,int offset) const{
     if(row < 0 || row >= static_cast<int>(m_lineStarts.size())){
         return "";
     }
     LOG("Getting row %d and size %d\n",row,size);
-    size_t startIndex = m_lineStarts[row];
+    size_t startIndex = m_lineStarts[row] + offset;
     size_t endIndex;
     if(row + 1 < static_cast<int>(m_lineStarts.size())){
         endIndex = m_lineStarts[row + 1] - 1;
     }else{
         endIndex = m_buffer.size();
+    }
+
+    if (startIndex > endIndex) {
+        return "";
     }
 
     return m_buffer.getLineFrom(startIndex, endIndex, size);
@@ -108,6 +112,7 @@ void Editor::moveUp(){
         newCursorPos = newRowEnd;
     }
 
+    // need to fix this to be more efficient
     while(m_buffer.cursor() > newCursorPos){
         m_buffer.moveLeft();
     }
@@ -135,6 +140,7 @@ void Editor::moveDown(){
         newCursorPos = newRowEnd;
     }
 
+    // need to fix this to be more efficient
     while(m_buffer.cursor() < newCursorPos){
         m_buffer.moveRight();
     }
