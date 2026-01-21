@@ -41,5 +41,5 @@ private:
     int m_scrollTopLine;
     int m_scrollLeftCol;
     
-    void adjustScrollToCursor(int viewportRows, int viewportCols);
+    void adjustScrollToCursor();
 };
